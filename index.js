@@ -22,8 +22,12 @@ function copyDereferenceSync (src, dest) {
       copyDereferenceSync(src + path.sep + entries[i], dest + path.sep + entries[i])
     }
   } else if (srcStats.isFile()) {
-    var contents = fs.readFileSync(src)
-    fs.writeFileSync(dest, contents, { flag: 'wx', mode: srcStats.mode })
+    if (fs.copyFileSync) {
+      fs.copyFileSync(src, dest, fs.constants.COPYFILE_EXCL)
+    } else {
+      var contents = fs.readFileSync(src)
+      fs.writeFileSync(dest, contents, { flag: 'wx', mode: srcStats.mode })
+    }
   } else {
     throw new Error('Unexpected file type for ' + src)
   }
